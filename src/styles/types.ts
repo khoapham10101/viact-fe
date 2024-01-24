@@ -7,6 +7,7 @@ declare module "@emotion/react" {
   interface Colors {
     white: string;
     black: string;
+    red: string;
   }
   export interface Theme {
     readonly colors: Colors;

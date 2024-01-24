@@ -4,8 +4,10 @@ export const theme = {
   colors: {
     white: "#FFFFFF",
     black: "#000000",
+    red: "#eb5757",
   },
   fontSize: {
+    12: "12px",
     13: "13px",
     14: "14px",
     15: "15px",
