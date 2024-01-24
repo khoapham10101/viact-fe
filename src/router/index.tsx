@@ -1,6 +1,7 @@
 import App from "App";
 import { PATH } from "constants/path";
 import BlankLayout from "layouts/BlankLayout";
+import ForgotPasswordPage from "pages/ForgotPassword";
 import LoginPage from "pages/LoginPage";
 import RegisterPage from "pages/Register";
 import { RouteObject } from "react-router-dom";
@@ -20,6 +21,10 @@ export const routesConfig: RouteObject[] = [
           {
             path: PATH.register,
             element: <RegisterPage />,
+          },
+          {
+            path: PATH.forgotPassword,
+            element: <ForgotPasswordPage />,
           },
         ],
       },
