@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import LogoIcon from "assets/icons/logo.svg";
-import InputCustom from "components/InputCustom";
+import InputCustom from "components/BaseUI/InputCustom";
 import { PATH } from "constants/path";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
