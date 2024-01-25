@@ -2,7 +2,6 @@
 import {
   Backdrop,
   Button,
-  Card,
   CardContent,
   Dialog,
   Paper,
@@ -11,7 +10,7 @@ import {
 import { Box } from "@mui/system";
 import React, { FC } from "react";
 
-import { RegisterPageStyle } from "../index.style";
+import { RegisterPageStyle } from "../../../pages/Register/index.style";
 
 interface TermAndConditionsPopupProps {
   open: boolean;

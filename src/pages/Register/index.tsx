@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Checkbox,
-  css,
   FormControlLabel,
   Grid,
   List,
@@ -13,14 +12,16 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import InputCustom from "components/InputCustom";
+import Logo from "assets/icons/logo.svg";
+import InputCustom from "components/BaseUI/InputCustom";
+import { PATH } from "constants/path";
 import { MuiTelInput, MuiTelInputProps } from "mui-tel-input";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import TermAndConditionsPopup from "../../components/Register/PrivateComponents/TermAndConditionsPopup";
 import { RegisterPageStyle } from "./index.style";
-import TermAndConditionsPopup from "./PrivateComponents/TermAndConditionsPopup";
 type FormData = {
   firstName: string;
   lastName: string;
@@ -91,7 +92,7 @@ const RegisterPage = () => {
                 <Box css={RegisterPageStyle.registerLogoContent}>
                   <img
                     css={RegisterPageStyle.registerLogo}
-                    src="https://dev.viact.net/logo-color.1ab1dfe3.svg"
+                    src={Logo}
                     alt="logo color"
                   />
                   <Typography
@@ -271,7 +272,7 @@ const RegisterPage = () => {
                   <Typography variant="body1" sx={{ marginTop: 2 }}>
                     Already have an account?{" "}
                     <a
-                      href="/login"
+                      href={PATH.login}
                       style={{
                         fontWeight: 700,
                         color: "rgb(235, 87, 87)",
