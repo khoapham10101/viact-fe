@@ -20,26 +20,17 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { UserService } from "services/user";
 import { UserPayload } from "services/user/type";
+import { User } from "types/user";
 import * as yup from "yup";
 
-import { CreateUserModalStyle } from "./index.style";
+import { UpdateUserModalStyle } from "./index.style";
 
-interface CreateUserModalProps {
+interface UpdateUserModalProps {
   open: boolean;
   onClose?: () => void;
   onReloadData?: () => void;
+  data: User;
 }
-
-// interface FormData {
-//   firstName: string;
-//   lastName: string;
-//   username: string;
-//   email: string;
-//   phoneNumber: string;
-//   password: string;
-//   confirmPassword: string;
-// }
-
 interface FormData extends UserPayload {
   confirmPassword: string;
 }
@@ -61,8 +52,8 @@ const schema = yup
   })
   .required();
 
-const CreateUserModal = (props: CreateUserModalProps) => {
-  const { open, onClose, onReloadData } = props;
+const UpdateUserModal = (props: UpdateUserModalProps) => {
+  const { open, onClose, onReloadData, data } = props;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -89,7 +80,10 @@ const CreateUserModal = (props: CreateUserModalProps) => {
 
     try {
       setIsLoading(true);
-      const { message } = await UserService.addNewUser(payload as UserPayload);
+      const { message } = await UserService.updateUser(
+        data.id,
+        payload as UserPayload,
+      );
       toast.success(message);
       handleClose();
       onReloadData && onReloadData();
@@ -104,7 +98,21 @@ const CreateUserModal = (props: CreateUserModalProps) => {
     onClose && onClose();
   };
 
+  const initForm = () => {
+    reset({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      username: data.username,
+      email: data.email,
+      phoneNumber: data.phoneNumber || "",
+    });
+  };
+
   useEffect(() => {
+    if (open) {
+      initForm();
+      return;
+    }
     reset();
     setErrorMessage("");
   }, [open]);
@@ -117,7 +125,7 @@ const CreateUserModal = (props: CreateUserModalProps) => {
         component: "form",
         onSubmit: handleSubmit(onSubmit),
       }}
-      css={CreateUserModalStyle.self}
+      css={UpdateUserModalStyle.self}
     >
       <DialogTitle>Create User</DialogTitle>
       <DialogContent>
@@ -214,4 +222,4 @@ const CreateUserModal = (props: CreateUserModalProps) => {
   );
 };
 
-export default CreateUserModal;
+export default UpdateUserModal;

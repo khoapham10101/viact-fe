@@ -56,7 +56,7 @@ const LoginPage = () => {
         return;
       }
       localStorage.setItem(TOKEN_STORAGE_KEY, data.accessToken);
-      toast.success("Login Successful");
+      toast.success(message);
       navigate(PATH.home, { replace: true });
     } catch (error: any) {
       setErrorMessage(error?.response?.data?.message);
