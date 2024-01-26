@@ -11,12 +11,13 @@ export type LoginResponse = ApiResponse<{
 }>;
 
 export interface RegisterPayload {
+  username: string;
   firstName: string;
   lastName: string;
-  email: string;
-  phone: string;
+  ememailail: string;
+  phoneNumber: string;
   password: string;
-  confirmPassword: string;
+  passwordConfirm: string;
 }
 
 export interface ResetPasswordPayload {
@@ -29,4 +30,8 @@ export type RegisterResponse = ApiResponse<null>;
 
 export interface ForgotPasswordPayload {
   email: string;
+}
+
+export interface VerificationPayload {
+  token: string;
 }

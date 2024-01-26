@@ -4,4 +4,6 @@ export const PATH = {
   register: "/register",
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
+  verifyAccount: "/verify-account",
+  error: "/error",
 };

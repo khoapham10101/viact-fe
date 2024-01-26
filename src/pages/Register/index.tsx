@@ -1,7 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import { LoadingButton } from "@mui/lab";
 import {
+  Alert,
   Box,
   Button,
   Checkbox,
@@ -14,23 +16,19 @@ import {
 } from "@mui/material";
 import Logo from "assets/icons/logo.svg";
 import InputCustom from "components/BaseUI/InputCustom";
+import PhoneInputCustom from "components/BaseUI/PhoneInputCustom";
 import { PATH } from "constants/path";
-import { matchIsValidTel, MuiTelInput, MuiTelInputProps } from "mui-tel-input";
+import { matchIsValidTel } from "mui-tel-input";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { AuthService } from "services/auth";
+import { RegisterPayload } from "services/auth/type";
 import * as yup from "yup";
 
 import TermAndConditionsPopup from "../../components/Register/PrivateComponents/TermAndConditionsPopup";
 import { RegisterPageStyle } from "./index.style";
-type FormData = {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-  phoneNumber: string;
-  password: string;
-  confirmPassword: string;
-};
 
 const schema = yup
   .object({
@@ -42,7 +40,7 @@ const schema = yup
       .string()
       .test("Phone is invalid", (value) => matchIsValidTel(value || "")),
     password: yup.string().required().min(8),
-    confirmPassword: yup
+    passwordConfirm: yup
       .string()
       .required()
       .oneOf([yup.ref("password")], "Passwords do not match"),
@@ -50,21 +48,28 @@ const schema = yup
   .required();
 
 const RegisterPage = () => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [phone, setPhone] = useState<string>("");
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const { control, handleSubmit } = useForm<FormData>({
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const { control, handleSubmit } = useForm<RegisterPayload>({
     resolver: yupResolver<any>(schema),
   });
 
-  const onSubmit = (form: FormData) => {
-    console.log(form);
-  };
-
-  const handlePhoneChange: MuiTelInputProps["onChange"] = (telNumber) => {
-    console.log("Phone Number: ", telNumber);
-    setPhone(telNumber);
+  const onSubmit = async (form: RegisterPayload) => {
+    try {
+      setIsLoading(true);
+      await AuthService.register(form);
+      toast.success("Register successfully");
+      navigate(PATH.login, { replace: true });
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTermsClick = () => {
@@ -179,7 +184,7 @@ const RegisterPage = () => {
                         required
                       />
                     </Grid>
-                    {/* <Grid item xs={12}>
+                    <Grid item xs={12}>
                       <InputCustom
                         control={control}
                         name="username"
@@ -187,7 +192,7 @@ const RegisterPage = () => {
                         fullWidth
                         required
                       />
-                    </Grid> */}
+                    </Grid>
                     <Grid item xs={12}>
                       <InputCustom
                         control={control}
@@ -198,12 +203,11 @@ const RegisterPage = () => {
                       />
                     </Grid>
                     <Grid item xs={12}>
-                      <MuiTelInput
+                      <PhoneInputCustom
+                        control={control}
                         label="Phone"
-                        onChange={handlePhoneChange}
-                        value={phone}
-                        defaultCountry="US"
                         id="phoneNumber"
+                        name="phoneNumber"
                         fullWidth
                         required
                       />
@@ -221,13 +225,14 @@ const RegisterPage = () => {
                     <Grid item xs={12}>
                       <InputCustom
                         control={control}
-                        name="confirmPassword"
+                        name="passwordConfirm"
                         type={showPassword ? "text" : "password"}
                         label="Confirm Password"
                         fullWidth
                         required
                       />
                     </Grid>
+
                     <Grid item xs={12}>
                       {/* Checkbox to show password */}
                       <FormControlLabel
@@ -249,18 +254,25 @@ const RegisterPage = () => {
                         }
                       />
                     </Grid>
+
+                    {!!errorMessage && (
+                      <Grid item xs={12}>
+                        <Alert severity="error">{errorMessage}</Alert>
+                      </Grid>
+                    )}
                   </Grid>
 
                   {/* Submit button */}
-                  <Button
+                  <LoadingButton
                     fullWidth
                     variant="contained"
                     color="secondary"
                     type="submit"
                     css={RegisterPageStyle.registerSubmitBtn}
+                    loading={isLoading}
                   >
                     SIGN UP
-                  </Button>
+                  </LoadingButton>
                 </form>
 
                 {/* Terms and Conditions */}

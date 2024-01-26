@@ -6,11 +6,11 @@ import {
   RegisterPayload,
   RegisterResponse,
   ResetPasswordPayload,
+  VerificationPayload,
 } from "./type";
 
 export const AuthService = {
   async login(payload: LoginPayload) {
-    console.log(payload);
     const { data } = await axiosRequest.post<LoginResponse>(
       "/auth/sign-in",
       payload,
@@ -20,7 +20,7 @@ export const AuthService = {
 
   async register(payload: RegisterPayload) {
     const { data } = await axiosRequest.post<RegisterResponse>(
-      "/register",
+      "/auth/sign-up",
       payload,
     );
     return data;
@@ -34,7 +34,12 @@ export const AuthService = {
   },
 
   async resetPassword(payload: ResetPasswordPayload) {
-    const { data } = await axiosRequest.post("/auth/forgot-password");
+    const { data } = await axiosRequest.post("/auth/forgot-password", payload);
+    return data;
+  },
+
+  async verifyAccount(payload: VerificationPayload) {
+    const { data } = await axiosRequest.post("/auth/verification", payload);
     return data;
   },
 };
