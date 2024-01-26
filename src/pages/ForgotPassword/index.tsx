@@ -77,7 +77,6 @@ const ForgotPasswordPage = () => {
                     control={control}
                     name="email"
                     label="Email"
-                    helperText=""
                     fullWidth
                   />
                 </Grid>

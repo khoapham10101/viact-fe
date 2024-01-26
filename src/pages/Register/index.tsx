@@ -15,8 +15,8 @@ import {
 import Logo from "assets/icons/logo.svg";
 import InputCustom from "components/BaseUI/InputCustom";
 import { PATH } from "constants/path";
-import { MuiTelInput, MuiTelInputProps } from "mui-tel-input";
-import React, { useState } from "react";
+import { matchIsValidTel, MuiTelInput, MuiTelInputProps } from "mui-tel-input";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -38,7 +38,9 @@ const schema = yup
     lastName: yup.string().required(),
     username: yup.string().required(),
     email: yup.string().email().required(),
-    phoneNumber: yup.string().required(),
+    phoneNumber: yup
+      .string()
+      .test("Phone is invalid", (value) => matchIsValidTel(value || "")),
     password: yup.string().required().min(8),
     confirmPassword: yup
       .string()
@@ -52,8 +54,8 @@ const RegisterPage = () => {
   const [phone, setPhone] = useState<string>("");
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
-  const { control, handleSubmit } = useForm({
-    resolver: yupResolver(schema),
+  const { control, handleSubmit } = useForm<FormData>({
+    resolver: yupResolver<any>(schema),
   });
 
   const onSubmit = (form: FormData) => {
@@ -156,6 +158,7 @@ const RegisterPage = () => {
                 <form
                   onSubmit={handleSubmit(onSubmit)}
                   css={RegisterPageStyle.formField}
+                  noValidate
                 >
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
@@ -164,6 +167,7 @@ const RegisterPage = () => {
                         name="firstName"
                         label="First Name"
                         fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -172,22 +176,25 @@ const RegisterPage = () => {
                         name="lastName"
                         label="Last Name"
                         fullWidth
+                        required
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                       <InputCustom
                         control={control}
                         name="username"
                         label="Username"
                         fullWidth
+                        required
                       />
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
                       <InputCustom
                         control={control}
                         name="email"
                         label="Email"
                         fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -198,6 +205,7 @@ const RegisterPage = () => {
                         defaultCountry="US"
                         id="phoneNumber"
                         fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -207,6 +215,7 @@ const RegisterPage = () => {
                         type={showPassword ? "text" : "password"}
                         label="Password"
                         fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -216,6 +225,7 @@ const RegisterPage = () => {
                         type={showPassword ? "text" : "password"}
                         label="Confirm Password"
                         fullWidth
+                        required
                       />
                     </Grid>
                     <Grid item xs={12}>
