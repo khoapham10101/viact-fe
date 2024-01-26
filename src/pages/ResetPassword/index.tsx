@@ -19,18 +19,19 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { AuthService } from "services/auth";
 import * as yup from "yup";
 
 import { ResetPasswordStyle } from "./index.style";
 
 interface FormData {
-  password: string;
+  newPassword: string;
   confirmPassword: string;
 }
 
 const schema = yup
   .object({
-    password: yup.string().required().min(8),
+    newPassword: yup.string().required().min(8),
     confirmPassword: yup
       .string()
       .required()
@@ -52,22 +53,24 @@ const ResetPassword = () => {
   const onSubmit = async (form: FormData) => {
     const { token } = Object.fromEntries(searchParams.entries());
     const payload = {
-      ...form,
       token,
+      newPassword: form.newPassword,
+      confirmPassword: form.confirmPassword,
     };
-    console.log(payload);
 
     try {
       setIsLoading(true);
-      await new Promise((resolve) => {
-        return setTimeout(() => {
-          resolve("ok");
-        }, 3000);
-      });
+      setErrorMessage("");
+      if (form.newPassword !== form.confirmPassword) {
+        setErrorMessage("Passwords do not match");
+        return;
+      }
+
+      await AuthService.resetPassword(payload);
       toast.success("Reset password successfully!");
       navigate(PATH.login, { replace: true });
-    } catch (error) {
-      //
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.message);
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +106,7 @@ const ResetPassword = () => {
                 <Grid item xs={12}>
                   <InputCustom
                     control={control}
-                    name="password"
+                    name="newPassword"
                     type={showPassword ? "text" : "password"}
                     label="Password"
                     fullWidth

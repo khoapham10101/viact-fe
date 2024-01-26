@@ -20,6 +20,7 @@ import { StatusCode } from "enums/statusCode";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { AuthService } from "services/auth";
 import { LoginPayload } from "services/auth/type";
 import { theme } from "styles/theme";
@@ -48,15 +49,18 @@ const LoginPage = () => {
   const onSubmit = async (form: LoginPayload) => {
     try {
       setIsLoading(true);
-      const { statusCode, message } = await AuthService.login(form);
+      setErrorMessage("");
+      const { statusCode, message, data } = await AuthService.login(form);
       if (statusCode !== StatusCode.SUCCESS) {
         setErrorMessage(message);
         return;
       }
-      localStorage.setItem(TOKEN_STORAGE_KEY, message);
+      localStorage.setItem(TOKEN_STORAGE_KEY, data.accessToken);
+      toast.success("Login Successful");
       navigate(PATH.home, { replace: true });
-    } catch (error) {
-      //
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.message);
+      return;
     } finally {
       setIsLoading(false);
     }

@@ -1,7 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import { LoadingButton } from "@mui/lab";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -11,14 +13,15 @@ import {
 } from "@mui/material";
 import LogoIcon from "assets/icons/logo.svg";
 import InputCustom from "components/BaseUI/InputCustom";
+import { StatusCode } from "enums/statusCode";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { AuthService } from "services/auth";
+import { SendEmailForgotPasswordPayload } from "services/auth/type";
 import * as yup from "yup";
 
 import { ForgotPasswordPageStyle } from "./index.style";
-
-interface FormData {
-  email: string;
-}
 
 const schema = yup
   .object({
@@ -30,9 +33,19 @@ const ForgotPasswordPage = () => {
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const onSubmit = (form: FormData) => {
-    console.log(form);
+  const onSubmit = async (form: SendEmailForgotPasswordPayload) => {
+    try {
+      setIsLoading(true);
+      await AuthService.sendEmailForgotPassword(form);
+      toast.success("Send Link Reset Password Successful");
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -82,23 +95,30 @@ const ForgotPasswordPage = () => {
                 </Grid>
               </Grid>
 
-              <Box marginTop="20px">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  fullWidth
-                  sx={{
-                    bgcolor: "#23b6d8 !important",
-                    fontSize: "12px",
-                    marginBottom: "12px",
-                    height: "48px",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  send verification email
-                </Button>
-              </Box>
+              {!!errorMessage && (
+                <Grid item xs={12}>
+                  <Alert severity="error">{errorMessage}</Alert>
+                </Grid>
+              )}
+
+              {/* Submit button */}
+              <LoadingButton
+                fullWidth
+                variant="contained"
+                color="secondary"
+                type="submit"
+                css={{
+                  bgcolor: "#23b6d8 !important",
+                  fontSize: "12px",
+                  marginBottom: "12px",
+                  height: "48px",
+                  textTransform: "uppercase",
+                  marginTop: "10px",
+                }}
+                loading={isLoading}
+              >
+                send verification email
+              </LoadingButton>
             </form>
           </Box>
         </CardContent>
