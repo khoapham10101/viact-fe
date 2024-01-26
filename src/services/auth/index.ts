@@ -6,6 +6,7 @@ import {
   RegisterPayload,
   RegisterResponse,
   ResetPasswordPayload,
+  SendEmailForgotPasswordPayload,
   VerificationPayload,
 } from "./type";
 
@@ -40,6 +41,14 @@ export const AuthService = {
 
   async verifyAccount(payload: VerificationPayload) {
     const { data } = await axiosRequest.post("/auth/verification", payload);
+    return data;
+  },
+
+  async sendEmailForgotPassword(payload: SendEmailForgotPasswordPayload) {
+    const { data } = await axiosRequest.post(
+      "/auth/send-email-forgot-password",
+      payload,
+    );
     return data;
   },
 };

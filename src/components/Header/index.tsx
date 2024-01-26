@@ -24,6 +24,7 @@ const settings = [Setting.Logout];
 const Header = () => {
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const navigate = useNavigate();
 
   const handleOpenUserMenu = (event: any) => {
     setAnchorElUser(event.currentTarget);
@@ -31,6 +32,8 @@ const Header = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    navigate(PATH.login, { replace: true });
   };
 
   const handleLogout = () => {

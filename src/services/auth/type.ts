@@ -14,7 +14,7 @@ export interface RegisterPayload {
   username: string;
   firstName: string;
   lastName: string;
-  ememailail: string;
+  email: string;
   phoneNumber: string;
   password: string;
   passwordConfirm: string;
@@ -22,7 +22,7 @@ export interface RegisterPayload {
 
 export interface ResetPasswordPayload {
   token: string;
-  password: string;
+  newPassword: string;
   confirmPassword: string;
 }
 
@@ -34,4 +34,8 @@ export interface ForgotPasswordPayload {
 
 export interface VerificationPayload {
   token: string;
+}
+
+export interface SendEmailForgotPasswordPayload {
+  email: string;
 }
