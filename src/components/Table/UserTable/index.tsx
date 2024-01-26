@@ -4,6 +4,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import {
+  Backdrop,
   Box,
   Button,
   IconButton,
@@ -16,86 +17,38 @@ import {
   TablePagination,
   TableRow,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import ConfirmDialog from "components/ConfirmDialog";
 import CreateUserModal from "components/Modal/User/CreateUserModal";
-import { useState } from "react";
+import UpdateUserModal from "components/Modal/User/UpdateUserModal";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { UserService } from "services/user";
+import { User } from "types/user";
 
 import { UserTableStyle } from "./index.style";
-
-const createData = (
-  fisrtName: string,
-  lastName: string,
-  username: string,
-  email: string,
-  phone: string,
-) => {
-  return { fisrtName, lastName, username, email, phone };
-};
-
-const rows = [
-  createData("Amet", "Minus", "consectet", "consectet@gmail.com", "0943254351"),
-  createData(
-    "Suscipit",
-    "Quos",
-    "possimus",
-    "possimus@gmail.com",
-    "0954354362",
-  ),
-  createData(
-    "Omnis",
-    "Quia",
-    "asperiores",
-    "asperiores@gmail.com",
-    "0954365463",
-  ),
-  createData("Quia", "Quos", "adipisici", "adipisici@gmail.com", "0954354362"),
-  createData(
-    "Aliquip",
-    "Eiusmod",
-    "commodi",
-    "commodi@gmail.com",
-    "0954354365",
-  ),
-  createData(
-    "Amet1",
-    "Minus1",
-    "consectet1",
-    "consectet1@gmail.com",
-    "0943254351",
-  ),
-  createData(
-    "Suscipit1",
-    "Quos1",
-    "possimus1",
-    "possimus1@gmail.com",
-    "0954354362",
-  ),
-  createData(
-    "Omnis1",
-    "Quia1",
-    "asperiores1",
-    "asperiores1@gmail.com",
-    "0954365463",
-  ),
-  createData(
-    "Quia1",
-    "Quos1",
-    "adipisici1",
-    "adipisici1@gmail.com",
-    "0954354362",
-  ),
-  createData(
-    "Aliquip1",
-    "Eiusmod1",
-    "commodi1",
-    "commodi1@gmail.com",
-    "0954354365",
-  ),
-];
 
 const UserTable = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openCreateUser, setOpenCreateUser] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [dataTable, setDataTable] = useState<User[]>([]);
+  const [idUserDelete, setIdUserDelete] = useState<string | null>(null);
+  const [showBackdrop, setShowBackdrop] = useState<boolean>(false);
+  const [userUpdate, setUserUpdate] = useState<User | null>(null);
+
+  const getListUser = async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await UserService.listUser();
+      setDataTable(data);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -108,8 +61,33 @@ const UserTable = () => {
     setPage(0);
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      setShowBackdrop(true);
+      const { message } = await UserService.deleteUser(idUserDelete as string);
+      toast.success(message);
+      setIdUserDelete(null);
+      setPage(0);
+      getListUser();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.messsage);
+    } finally {
+      setShowBackdrop(false);
+    }
+  };
+
+  useEffect(() => {
+    getListUser();
+  }, []);
+
   return (
     <Box css={UserTableStyle.self}>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={showBackdrop}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <Box
         display="flex"
         justifyContent="flex-end"
@@ -126,58 +104,100 @@ const UserTable = () => {
         </Button>
       </Box>
       <TableContainer component={Paper}>
-        <Table stickyHeader sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>First name</TableCell>
-              <TableCell align="left">Last name</TableCell>
-              <TableCell align="left">Username</TableCell>
-              <TableCell align="left">Email</TableCell>
-              <TableCell align="left">Phone</TableCell>
-              <TableCell align="left"></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <TableRow
-                  key={row.fisrtName}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.fisrtName}
-                  </TableCell>
-                  <TableCell component="th">{row.lastName}</TableCell>
-                  <TableCell align="left">{row.username}</TableCell>
-                  <TableCell align="left">{row.email}</TableCell>
-                  <TableCell align="left">{row.phone}</TableCell>
-                  <TableCell align="left">
-                    <IconButton aria-label="update">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton aria-label="delete">
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+        {isLoading ? (
+          <Box
+            height={400}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <Table
+              stickyHeader
+              sx={{ minWidth: 650 }}
+              aria-label="simple table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left">ID</TableCell>
+                  <TableCell align="left">First name</TableCell>
+                  <TableCell align="left">Last name</TableCell>
+                  <TableCell align="left">Username</TableCell>
+                  <TableCell align="left">Email</TableCell>
+                  <TableCell align="left">Phone</TableCell>
+                  <TableCell align="left"></TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 20]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
+              </TableHead>
+              <TableBody>
+                {dataTable
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => (
+                    <TableRow
+                      key={row.id}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">
+                        {row.id}
+                      </TableCell>
+                      <TableCell component="th" scope="row">
+                        {row.firstName}
+                      </TableCell>
+                      <TableCell component="th">{row.lastName}</TableCell>
+                      <TableCell align="left">{row.username}</TableCell>
+                      <TableCell align="left">{row.email}</TableCell>
+                      <TableCell align="left">{row.phoneNumber}</TableCell>
+                      <TableCell align="left">
+                        <IconButton
+                          aria-label="update"
+                          onClick={() => setUserUpdate(row)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={() => setIdUserDelete(row.id)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 20]}
+              component="div"
+              count={dataTable.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </>
+        )}
       </TableContainer>
 
       <CreateUserModal
         open={openCreateUser}
         onClose={() => setOpenCreateUser(false)}
+        onReloadData={getListUser}
+      />
+
+      <ConfirmDialog
+        open={!!idUserDelete}
+        onClose={() => setIdUserDelete(null)}
+        title="Are you sure you want to delete?"
+        onConfirm={handleDeleteUser}
+      />
+
+      <UpdateUserModal
+        open={!!userUpdate}
+        onClose={() => setUserUpdate(null)}
+        data={userUpdate as User}
+        onReloadData={getListUser}
       />
     </Box>
   );

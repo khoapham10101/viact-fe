@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { TOKEN_STORAGE_KEY } from "constants/common";
 
 const baseURL = process.env.REACT_APP_API_URL;
 
@@ -12,7 +13,7 @@ const axiosRequest: AxiosInstance = axios.create({
 
 axiosRequest.interceptors.request.use(
   (config) => {
-    const accessToken = "";
+    const accessToken = localStorage.getItem(TOKEN_STORAGE_KEY);
     if (config.headers) {
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;

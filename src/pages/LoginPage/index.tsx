@@ -48,12 +48,12 @@ const LoginPage = () => {
   const onSubmit = async (form: LoginPayload) => {
     try {
       setIsLoading(true);
-      const { statusCode, message } = await AuthService.login(form);
+      const { statusCode, message, data } = await AuthService.login(form);
       if (statusCode !== StatusCode.SUCCESS) {
         setErrorMessage(message);
         return;
       }
-      localStorage.setItem(TOKEN_STORAGE_KEY, message);
+      localStorage.setItem(TOKEN_STORAGE_KEY, data.accessToken);
       navigate(PATH.home, { replace: true });
     } catch (error) {
       //

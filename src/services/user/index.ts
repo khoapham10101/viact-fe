@@ -1,10 +1,10 @@
 import axiosRequest from "services";
 
-import { ListUserPayload, UserPayload } from "./type";
+import { CreateUserResponse, GetListUserResponse, UserPayload } from "./type";
 
 export const UserService = {
-  async listUser(payload: ListUserPayload) {
-    const { data } = await axiosRequest.post("/user/list", payload);
+  async listUser() {
+    const { data } = await axiosRequest.post<GetListUserResponse>("/user/list");
     return data;
   },
 
@@ -14,7 +14,10 @@ export const UserService = {
   },
 
   async addNewUser(payload: UserPayload) {
-    const { data } = await axiosRequest.post("/user/add", payload);
+    const { data } = await axiosRequest.post<CreateUserResponse>(
+      "/user/add",
+      payload,
+    );
     return data;
   },
 

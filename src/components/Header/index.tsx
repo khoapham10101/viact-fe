@@ -10,9 +10,10 @@ import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import Logo from "assets/icons/logo.svg";
+import { TOKEN_STORAGE_KEY } from "constants/common";
 import { PATH } from "constants/path";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 enum Setting {
   Logout = "logout",
@@ -21,6 +22,7 @@ enum Setting {
 const settings = [Setting.Logout];
 
 const Header = () => {
+  const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleOpenUserMenu = (event: any) => {
@@ -33,6 +35,8 @@ const Header = () => {
 
   const handleLogout = () => {
     handleCloseUserMenu();
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+    navigate(PATH.login, { replace: true });
   };
 
   const handleClickMenu = (value: Setting) => {
