@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { UserService } from "services/user";
-import { UserPayload } from "services/user/type";
+import { UpdateUserPayload, UserPayload } from "services/user/type";
 import { User } from "types/user";
 import * as yup from "yup";
 
@@ -31,9 +31,6 @@ interface UpdateUserModalProps {
   onReloadData?: () => void;
   data: User;
 }
-interface FormData extends UserPayload {
-  confirmPassword: string;
-}
 
 const schema = yup
   .object({
@@ -44,11 +41,6 @@ const schema = yup
     phoneNumber: yup
       .string()
       .test("Phone is invalid", (value) => matchIsValidTel(value || "")),
-    password: yup.string().required().min(8),
-    confirmPassword: yup
-      .string()
-      .required()
-      .oneOf([yup.ref("password")], "Passwords do not match"),
   })
   .required();
 
@@ -58,32 +50,22 @@ const UpdateUserModal = (props: UpdateUserModalProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const { control, reset, handleSubmit } = useForm<FormData>({
+  const { control, reset, handleSubmit } = useForm<UpdateUserPayload>({
     resolver: yupResolver<any>(schema),
     defaultValues: {
       firstName: "",
       lastName: "",
       username: "",
       email: "",
-      password: "",
       phoneNumber: "",
-      confirmPassword: "",
     },
   });
 
-  const onSubmit = async (form: FormData) => {
+  const onSubmit = async (form: UpdateUserPayload) => {
     // console.log(form);
-    const payload = {
-      ...form,
-    } as Partial<FormData>;
-    delete payload.confirmPassword;
-
     try {
       setIsLoading(true);
-      const { message } = await UserService.updateUser(
-        data.id,
-        payload as UserPayload,
-      );
+      const { message } = await UserService.updateUser(data.id, form);
       toast.success(message);
       handleClose();
       onReloadData && onReloadData();
@@ -174,26 +156,6 @@ const UpdateUserModal = (props: UpdateUserModalProps) => {
                 label="Phone"
                 id="phoneNumber"
                 name="phoneNumber"
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <InputCustom
-                control={control}
-                name="password"
-                type="password"
-                label="Password"
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <InputCustom
-                control={control}
-                name="confirmPassword"
-                type="password"
-                label="Confirm Password"
                 fullWidth
                 required
               />

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { TOKEN_STORAGE_KEY } from "constants/common";
+import { PATH } from "constants/path";
 
 const baseURL = process.env.REACT_APP_API_URL;
 
@@ -31,9 +32,10 @@ axiosRequest.interceptors.response.use(
     return response;
   },
   function (error) {
-    // if (error.response.status === 401) {
-    //   //
-    // }
+    if (error.response.data.statusCode === 401) {
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+      window.location.href = PATH.login;
+    }
     return Promise.reject(error);
   },
 );

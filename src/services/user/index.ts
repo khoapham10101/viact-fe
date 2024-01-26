@@ -1,6 +1,11 @@
 import axiosRequest from "services";
 
-import { CreateUserResponse, GetListUserResponse, UserPayload } from "./type";
+import {
+  CreateUserResponse,
+  GetListUserResponse,
+  UpdateUserPayload,
+  UserPayload,
+} from "./type";
 
 export const UserService = {
   async listUser() {
@@ -21,7 +26,7 @@ export const UserService = {
     return data;
   },
 
-  async updateUser(id: string, payload: UserPayload) {
+  async updateUser(id: string, payload: UpdateUserPayload) {
     const { data } = await axiosRequest.put(`/user/${id}`, payload);
     return data;
   },

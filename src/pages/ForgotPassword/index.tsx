@@ -2,18 +2,9 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { LoadingButton } from "@mui/lab";
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  Typography,
-} from "@mui/material";
+import { Alert, Box, Card, CardContent, Grid, Typography } from "@mui/material";
 import LogoIcon from "assets/icons/logo.svg";
 import InputCustom from "components/BaseUI/InputCustom";
-import { StatusCode } from "enums/statusCode";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -38,9 +29,10 @@ const ForgotPasswordPage = () => {
 
   const onSubmit = async (form: SendEmailForgotPasswordPayload) => {
     try {
+      setErrorMessage("");
       setIsLoading(true);
-      await AuthService.sendEmailForgotPassword(form);
-      toast.success("Send Link Reset Password Successful");
+      const { message } = await AuthService.sendEmailForgotPassword(form);
+      toast.success(message);
     } catch (error: any) {
       setErrorMessage(error?.response?.data?.message);
     } finally {
@@ -96,7 +88,7 @@ const ForgotPasswordPage = () => {
               </Grid>
 
               {!!errorMessage && (
-                <Grid item xs={12}>
+                <Grid item xs={12} css={{ marginTop: "10px" }}>
                   <Alert severity="error">{errorMessage}</Alert>
                 </Grid>
               )}

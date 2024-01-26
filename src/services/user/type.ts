@@ -21,3 +21,5 @@ export interface UserPayload {
 export type GetListUserResponse = ApiResponse<User[]>;
 
 export type CreateUserResponse = ApiResponse<User>;
+
+export type UpdateUserPayload = Omit<UserPayload, "password">;
