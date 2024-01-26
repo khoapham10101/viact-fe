@@ -1,9 +1,9 @@
 /** @jsxImportSource @emotion/react */
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Box,
-  Button,
   Card,
   CardContent,
   Checkbox,
@@ -17,32 +17,33 @@ import { PATH } from "constants/path";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { LoginPayload } from "services/auth/type";
 import { theme } from "styles/theme";
 import * as yup from "yup";
 
 import { LoginPageStyle } from "./index.style";
 
-interface FormData {
-  username: string;
-  password: string;
-}
-
 const schema = yup
   .object({
-    username: yup.string().required(),
+    email: yup.string().email().required(),
     password: yup.string().required(),
   })
   .required();
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (form: FormData) => {
-    console.log(form);
+  const onSubmit = async (form: LoginPayload) => {
+    // console.log(form);
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
   };
 
   return (
@@ -70,8 +71,8 @@ const LoginPage = () => {
               <Grid item xs={12}>
                 <InputCustom
                   control={control}
-                  name="username"
-                  label="Email or Username"
+                  name="email"
+                  label="Email"
                   fullWidth
                 />
               </Grid>
@@ -118,7 +119,7 @@ const LoginPage = () => {
             </Box>
 
             <Box marginTop="20px">
-              <Button
+              <LoadingButton
                 type="submit"
                 variant="contained"
                 size="large"
@@ -129,31 +130,10 @@ const LoginPage = () => {
                   marginBottom: "12px",
                   height: "48px",
                 }}
+                loading={isLoading}
               >
                 LOGIN
-              </Button>
-              <Typography
-                sx={{
-                  textAlign: "center",
-                  marginBottom: "10px",
-                  fontSize: "14px",
-                }}
-              >
-                OR
-              </Typography>
-              <Button
-                variant="contained"
-                size="large"
-                fullWidth
-                sx={{
-                  bgcolor: `${theme.colors.red} !important`,
-                  fontSize: "12px",
-                  marginBottom: "12px",
-                  height: "48px",
-                }}
-              >
-                Login with google
-              </Button>
+              </LoadingButton>
             </Box>
 
             <Typography
