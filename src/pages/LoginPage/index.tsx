@@ -3,6 +3,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import LoadingButton from "@mui/lab/LoadingButton";
 import {
+  Alert,
   Box,
   Card,
   CardContent,
@@ -13,10 +14,13 @@ import {
 } from "@mui/material";
 import LogoIcon from "assets/icons/logo.svg";
 import InputCustom from "components/BaseUI/InputCustom";
+import { TOKEN_STORAGE_KEY } from "constants/common";
 import { PATH } from "constants/path";
-import { useState } from "react";
+import { StatusCode } from "enums/statusCode";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthService } from "services/auth";
 import { LoginPayload } from "services/auth/type";
 import { theme } from "styles/theme";
 import * as yup from "yup";
@@ -31,20 +35,43 @@ const schema = yup
   .required();
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const { control, handleSubmit } = useForm({
     resolver: yupResolver(schema),
   });
 
   const onSubmit = async (form: LoginPayload) => {
-    // console.log(form);
-    setIsLoading(true);
-    setTimeout(() => {
+    try {
+      setIsLoading(true);
+      const { statusCode, message } = await AuthService.login(form);
+      if (statusCode !== StatusCode.SUCCESS) {
+        setErrorMessage(message);
+        return;
+      }
+      localStorage.setItem(TOKEN_STORAGE_KEY, message);
+      navigate(PATH.home, { replace: true });
+    } catch (error) {
+      //
+    } finally {
       setIsLoading(false);
-    }, 3000);
+    }
   };
+
+  const checkIsAuthenticated = () => {
+    const token = localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (token) {
+      navigate(PATH.home, { replace: true });
+    }
+  };
+
+  useEffect(() => {
+    checkIsAuthenticated();
+  }, []);
 
   return (
     <div css={LoginPageStyle.self}>
@@ -85,6 +112,11 @@ const LoginPage = () => {
                   fullWidth
                 />
               </Grid>
+              {!!errorMessage && (
+                <Grid item xs={12}>
+                  <Alert severity="error">{errorMessage}</Alert>
+                </Grid>
+              )}
             </Grid>
 
             <Box

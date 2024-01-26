@@ -85,8 +85,6 @@ const Header = () => {
           <Typography
             variant="h5"
             noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -98,7 +96,15 @@ const Header = () => {
               textDecoration: "none",
             }}
           >
-            LOGO
+            <Link
+              to={PATH.home}
+              style={{
+                color: "white",
+                textDecoration: "none",
+              }}
+            >
+              LOGO
+            </Link>
           </Typography>
 
           <Box sx={{ flexGrow: 0 }}>

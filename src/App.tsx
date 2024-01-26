@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="App">
       <GlobalStyles />
-      <ToastContainer />
+      <ToastContainer className="non-reset" />
       <Outlet />
     </div>
   );

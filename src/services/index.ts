@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-const baseURL = "";
+const baseURL = process.env.REACT_APP_API_URL;
 
 const axiosRequest: AxiosInstance = axios.create({
   baseURL,
@@ -30,9 +30,9 @@ axiosRequest.interceptors.response.use(
     return response;
   },
   function (error) {
-    if (error.response.status === 401) {
-      //
-    }
+    // if (error.response.status === 401) {
+    //   //
+    // }
     return Promise.reject(error);
   },
 );
