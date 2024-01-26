@@ -9,6 +9,7 @@ import RegisterPage from "pages/Register";
 import ResetPassword from "pages/ResetPassword";
 import { RouteObject } from "react-router-dom";
 
+import ProtectedNonAuth from "./protectedNonAuth";
 import ProtectedRoute from "./protectedRoute";
 
 export const routesConfig: RouteObject[] = [
@@ -21,15 +22,27 @@ export const routesConfig: RouteObject[] = [
         children: [
           {
             path: PATH.login,
-            element: <LoginPage />,
+            element: (
+              <ProtectedNonAuth>
+                <LoginPage />
+              </ProtectedNonAuth>
+            ),
           },
           {
             path: PATH.register,
-            element: <RegisterPage />,
+            element: (
+              <ProtectedNonAuth>
+                <RegisterPage />
+              </ProtectedNonAuth>
+            ),
           },
           {
             path: PATH.forgotPassword,
-            element: <ForgotPasswordPage />,
+            element: (
+              <ProtectedNonAuth>
+                <ForgotPasswordPage />
+              </ProtectedNonAuth>
+            ),
           },
           {
             path: PATH.resetPassword,
